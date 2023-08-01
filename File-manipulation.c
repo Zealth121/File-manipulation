@@ -47,10 +47,10 @@ int main(){
                 file_retrieve_student_data(fptr);
                 break;
             case '4':
-                file_find_student_by_name(fptr, 0);
+                file_find_student_by_name(fptr, 1);
                 break;
             case '5':
-                file_find_student_by_name(fptr, 1);
+                file_find_student_by_name(fptr, 0);
                 break;
             case '6':
                 printf("\nThank you for using this application!\n");
@@ -115,7 +115,7 @@ void file_add_student(FILE *fptr){
     // creates the student struct and changes its values from the user input
     student student1;
 
-    printf("\nEnter your full name: ");
+    printf("\nEnter your first and last name: ");
     scanf(" %c");
     fgets(student1.name, 30, stdin);
     student1.name[strlen(student1.name)-1] = '\0';
@@ -132,6 +132,8 @@ void file_add_student(FILE *fptr){
 }
 void file_find_student_by_name(FILE *fptr, bool retrieveData){
 
+    bool foundName = 0;
+
     char name[30];
     char tempName[30];
     char lastName[15];
@@ -139,10 +141,10 @@ void file_find_student_by_name(FILE *fptr, bool retrieveData){
     float gpa;
 
     // gathers the name of the student they want to retrieve/delete
-    if(retrieveData == 0){
-        printf("Full name of student: ");
+    if(retrieveData == 1){
+        printf("first and last name of student: ");
     }else{
-        printf("Full name of student you would like to remove: ");
+        printf("first and last name of student you would like to remove: ");
     }
     scanf(" %c");
     fgets(name, 30, stdin);
@@ -179,7 +181,8 @@ void file_find_student_by_name(FILE *fptr, bool retrieveData){
                 ch2 = toupper(name[i]);
             if(tempName[i] == '\0' && name[i] == '\0'){
                 // if the name matches then I print out the data or delete it
-                if(retrieveData == 0){
+                foundName = 1;
+                if(retrieveData == 1){
                     printf("\nName: %s\n", tempName);
                     printf("Age: %i\n", age);
                     printf("GPA: %.2f\n", gpa);
@@ -194,6 +197,11 @@ void file_find_student_by_name(FILE *fptr, bool retrieveData){
         counter++;
     }
 
+    if(foundName != 1){
+        printf("\nCould not find the name specified\n");
+        printf("Ensure you have spelled the name correctly\n");
+        printf("and that you provided the first and last name\n");
+    }
     fclose(fptr);
 }
 void file_remove_line(FILE *fptr, int lineCounter){
