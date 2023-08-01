@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// student struct that gets added to the file
 typedef struct student{
     char name[30];
     int age;
@@ -15,17 +16,18 @@ void file_read(FILE*);
 void file_retrieve_student_data(FILE*);
 void file_add_student(FILE*);
 void file_remove_student(FILE*);
-void file_find_student_by_name(FILE*);
+void file_find_student_data_by_name(FILE*);
 void file_remove_line(FILE*, int);
 
 int main(){
     
+    // this is the student file that is used all throughout the program
     FILE *fptr;
     file_create(fptr, 1);
 
-    int response;
-
+    char response;
     do{
+        // prints the options that the user can choose from and scans for the response
         printf("\nWhat would you like to do with the file?\n\n");
         printf("1. Add student data to the file\n");
         printf("2. Clear the file\n");
@@ -34,53 +36,66 @@ int main(){
         printf("5. Remove student from the file\n");
         printf("6. Quit this application\n");
 
-        scanf(" %i", &response);
+        scanf(" %c", &response);
         switch(response){
-            case 1:
+            // depending on the number chosen I will call the function necessary
+            case '1':
                 file_add_student(fptr);
                 break;
-            case 2:
+            case '2':
                 file_create(fptr, 0);
                 break;
-            case 3: 
+            case '3': 
                 file_retrieve_student_data(fptr);
                 break;
-            case 4:
-                file_find_student_by_name(fptr);
+            case '4':
+                file_find_student_data_by_name(fptr);
                 break;
-            case 5:
+            case '5':
                 file_remove_student(fptr);
                 break;
-            case 6:
+            case '6':
                 printf("\nThank you for using this application!\n");
                 break;
             default:
                 printf("You have not chosen a valid option!\n");
                 break;
         }
-    }while(response != 6);
+    }while(response != '6');
 
     return 0;
 }
-void file_create(FILE *fptr, bool rewriteFile){
+void file_create(FILE *fptr, bool clearFile){
+    // creates the students file or clears the file depending on the clearFile boolean
     fptr = fopen("students.txt", "r");
-    if(fptr == NULL || rewriteFile == 0){
+    if(fptr == NULL || clearFile == 0){
         fptr = fopen("students.txt", "w");
-        fclose(fptr);   
+        fclose(fptr);
+        // lets the user know the file has been cleared
+        if(clearFile == 0){
+            printf("The file has been successfully cleared\n");
+        }
     }
 }
 void file_read(FILE *fptr){
-    char ch;
+    /*
+        This funciton may be removed soon
+        I do not currently ever call it
+    */
 
+    // opens the student file to be read
     fptr = fopen("students.txt", "r");
     if(fptr == NULL){
         printf("file can't be opened\n");
+        // creates the file if it hasnt been created then recalls this function
         file_create(fptr, 1);
         file_read(fptr);
     }
 
     printf("content of this file: \n\n");
+    char ch;
     do{
+        // for each character in the file it will print it out.
         ch = fgetc(fptr);
         printf("%c", ch);
 
@@ -89,22 +104,27 @@ void file_read(FILE *fptr){
     fclose(fptr);
 }
 void file_retrieve_student_data(FILE *fptr){
+    // opens the student file
     fptr = fopen("students.txt", "r");
 
+    // declares the variables I will need to use when retrieving data
     char firstName[15];
     char lastName[15];
     int age;
     float gpa;
 
     char line[256];
+    // this while loop goes through each line of the file and searches for specific data
     while(fgets(line, sizeof(line), fptr) != NULL){
         sscanf(line, "%s %s %i, %f", &firstName, &lastName, &age, &gpa);
         for(int i = 0; i < 15; i++){
             if(lastName[i] == ','){
+                // removes the comma from the last name due to how scanning strings work
                 lastName[i] = '\0';
                 break;
             }
         }
+        // prints out the data from the line
         printf("\nName: %s %s\n", firstName, lastName);
         printf("Age: %i\n", age);
         printf("gpa: %.1f\n", gpa);
@@ -114,12 +134,13 @@ void file_retrieve_student_data(FILE *fptr){
 }
 void file_add_student(FILE *fptr){
 
+    // opens the student file
     fptr = fopen("students.txt", "a");
-
     if(fptr == NULL){
         printf("file can't be opened\n");
     }
 
+    // creates the student struct and changes its values from the user input
     student student1;
 
     printf("\nEnter your full name: ");
@@ -133,6 +154,7 @@ void file_add_student(FILE *fptr){
     printf("\nEnter your gpa: ");
     scanf(" %f", &student1.gpa);
 
+    // writes to the file the student data
     fprintf(fptr, "%s, %i, %f\n", student1.name, student1.age, student1.gpa);
     fclose(fptr);
 }
@@ -142,19 +164,27 @@ void file_remove_student(FILE *fptr){
     char tempName[30];
     char lastName[15];
 
+    // gathers the name of the student they want to remove from the file
     printf("Full name of student you would like to remove: ");
     scanf(" %c");
     fgets(name, 30, stdin);
     name[strlen(name)-1] = '\0';
 
+    // opens the student file
     fptr = fopen("students.txt", "r");
     if(fptr == NULL){
         printf("file can't be opened");
     }
 
+    // the float f is a temporary variable I will not be using
     float f;
     int counter = 0;
     char line[256];
+    /* 
+    for every line in the file I look for the name given
+    I keep track of the current line
+    if the name from the line and the name given match I remove that line
+    */
     while(fgets(line, sizeof(line), fptr) != NULL){
         sscanf(line, "%s %s %i, %f", &tempName, &lastName, &f, &f);
         for(int i = 0; i < 15; i++){
@@ -173,6 +203,7 @@ void file_remove_student(FILE *fptr){
                 ch1 = toupper(tempName[i]);
                 ch2 = toupper(name[i]);
             if(tempName[i] == '\0' && name[i] == '\0'){
+                // if the name matches then I call the function to remove this specific line
                 file_remove_line(fptr, counter);
             } else if(ch1 == ch2){
                 continue;
@@ -184,11 +215,12 @@ void file_remove_student(FILE *fptr){
 
     fclose(fptr);
 }
-void file_find_student_by_name(FILE *fptr){
+void file_find_student_data_by_name(FILE *fptr){
 
 }
 void file_remove_line(FILE *fptr, int lineCounter){
-    
+
+    // creates a temporary file
     FILE *temp;
     temp = fopen("temp.txt", "w");
     freopen("temp.txt", "a", temp);
@@ -196,11 +228,14 @@ void file_remove_line(FILE *fptr, int lineCounter){
         printf("temp file can't be created");
     }
 
+    // opens the student file
     fptr = fopen("students.txt", "r");
     if(fptr == NULL){
         printf("file can't be opened");
     }
 
+    // I write all of the student data into the temp file
+    // except for the line we want to delete
     char line[256];
     int count = 0;
     while(fgets(line, sizeof(line), fptr) != NULL){
@@ -210,14 +245,17 @@ void file_remove_line(FILE *fptr, int lineCounter){
         count++;
     }
 
+    // I change the temp file to read and clear the student file
     freopen("temp.txt", "r", temp);
 
     freopen("students.txt", "w", fptr);
     freopen("students.txt", "a", fptr);
     while(fgets(line, sizeof(line), temp) != NULL){
+        //I copy every line from the temp file into  the student file
         fprintf(fptr, line);
     }
 
+    // delete the temporary file
     fclose(fptr);
     fclose(temp);
     remove("temp.txt");
