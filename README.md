@@ -1,7 +1,8 @@
 # File-manipulation
 
-First C project. Only works on windows
-to run just run the .exe file
+First C project.
+to run on windows run the executable file.
+to run on linux you will need to compile it yourself.
 
 This program allows you to add students into a file on your computer.
 You can remove students from this file, retrieve the entire files data, retrieve a specific students data and more...
