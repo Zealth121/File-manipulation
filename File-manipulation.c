@@ -116,7 +116,7 @@ void file_add_student(FILE *fptr){
     student student1;
 
     printf("\nEnter your first and last name: ");
-    scanf(" %c");
+    scanf(" ");
     fgets(student1.name, 30, stdin);
     student1.name[strlen(student1.name)-1] = '\0';
 
@@ -146,7 +146,7 @@ void file_find_student_by_name(FILE *fptr, bool retrieveData){
     }else{
         printf("first and last name of student you would like to remove: ");
     }
-    scanf(" %c");
+    scanf(" ");
     fgets(name, 30, stdin);
     name[strlen(name)-1] = '\0';
 
